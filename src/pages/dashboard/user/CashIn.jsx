@@ -42,10 +42,11 @@ const CashIn = () => {
     //   setLoading(true)
       const emailOrMobile = data.emailOrMobile;
       const amount= data.amount;
+      delete user.balance
       const sender = {
         ...user,
         timeStamp: new Date(),
-        amount,
+        totalAmount:amount,
         agent: emailOrMobile,
         type:"cash-in"
       };

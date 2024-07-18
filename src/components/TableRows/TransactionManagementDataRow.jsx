@@ -3,22 +3,22 @@ import PropTypes from 'prop-types'
 import Swal from 'sweetalert2';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 import useAuth from '../../hooks/useAuth';
-const TransactionManagementDataRow = ({payment,i}) => {
+const TransactionManagementDataRow = ({payment,i,refetch}) => {
   const axiosSecure = useAxiosSecure();
 
-  const { user, setUser, loading, setLoading,refetch } = useAuth();
+  const { user, setUser, loading,} = useAuth();
   const { mutateAsync } = useMutation({
     mutationFn: async (senderData) => {
       const { data } = await axiosSecure.put(
         `/transactions-management/${user.email}`,
         senderData
       );
+      console.log(data);
       return data;
     }
   });
 
-  const handleApprove=()=>{
-
+  const handleApprove= async(data)=>{
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -27,14 +27,17 @@ const TransactionManagementDataRow = ({payment,i}) => {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, Approve it!"
-    }).then((result) => {
+    }).then(async(result) => {
       if (result.isConfirmed) {
-
-        Swal.fire({
-          title: "Deleted!",
-          text: "Your file has been deleted.",
-          icon: "success"
-        });
+         const res=await mutateAsync(data)
+         if (res?.modifiedCount>0) {
+          refetch()
+           Swal.fire({
+             title: "Approved!",
+             text: "Your Transactions has been Approved.",
+             icon: "success"
+           });
+         }
       }
     });
   }
@@ -53,7 +56,7 @@ const TransactionManagementDataRow = ({payment,i}) => {
       </td>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
         <p className='text-gray-900 whitespace-no-wrap'>
-        BDT: {payment?.amount}
+        BDT: {payment?.totalAmount}
             </p>
       </td>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
@@ -63,7 +66,7 @@ const TransactionManagementDataRow = ({payment,i}) => {
             </p>
       </td>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
-        <button onClick={handleApprove} className='text-gray-900 p-2 bg-gray-300 rounded-xl whitespace-no-wrap'>
+        <button onClick={()=>handleApprove(payment)} className='text-gray-900 p-2 bg-gray-300 rounded-xl whitespace-no-wrap'>
           Approves
         </button>
       </td>

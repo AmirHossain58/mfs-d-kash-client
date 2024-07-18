@@ -4,7 +4,6 @@ import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import PaymentHistoryDataRow from "../../../components/TableRows/PaymentHistoryDataRow";
 
 import { Helmet } from "react-helmet-async";
-import TransactionManagementDataRow from './../../../components/TableRows/TransactionManagementDataRow';
 
 const TransactionHistory = () => {
   const axiosSecure = useAxiosSecure();
@@ -12,7 +11,7 @@ const TransactionHistory = () => {
   const { data: payments = [], isLoading } = useQuery({
     queryKey: ["transactions-history", user.email],
     queryFn: async () => {
-      const res = await axiosSecure(`/transactions-management/${user.email}`);
+      const res = await axiosSecure(`/transactions-history/${user.email}`);
       return res?.data;
     },
   });
@@ -22,6 +21,9 @@ const TransactionHistory = () => {
       <Helmet>
         <title>Dashboard | Payment History</title>
       </Helmet>
+      <div className="flex justify-evenly mt-20">
+        <h4 className="text-4xl">Total Payments: {payments?.length}</h4>
+      </div>
       <div className="container min-h-[calc(100vh-250px)] mx-auto px-4 sm:px-8">
         <div className="py-8">
           <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
@@ -57,13 +59,13 @@ const TransactionHistory = () => {
                       scope="col"
                       className="px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal"
                     >
-                    Transaction DATE
+                      Send To
                     </th>
                     <th
                       scope="col"
                       className="px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal"
-                      >
-                        Action
+                    >
+                      PAYMENT DATE
                     </th>
                   </tr>
                 </thead>
@@ -71,11 +73,11 @@ const TransactionHistory = () => {
                   {/* Table Row Data */}
                   {payments &&
                     payments?.map((payment, i) => (
-                      <TransactionManagementDataRow
+                      <PaymentHistoryDataRow
                         i={i}
                         payment={payment}
                         key={i}
-                      ></TransactionManagementDataRow>
+                      ></PaymentHistoryDataRow>
                     ))}
                 </tbody>
               </table>
